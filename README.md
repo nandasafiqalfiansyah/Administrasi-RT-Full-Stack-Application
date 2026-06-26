@@ -1,453 +1,381 @@
 # Administrasi RT - Full Stack Application
 
-Aplikasi administrasi RT modern dengan Laravel 12 (Backend) dan React 19 (Frontend) yang dibangun dengan arsitektur Clean Architecture.
+Aplikasi web-based untuk mengelola administrasi RT (Rukun Tetangga) yang mencakup manajemen penghuni, rumah, pembayaran iuran, tagihan, pengeluaran, dan laporan keuangan.
 
-## Teknologi
+## 📋 Fitur Utama
+
+- **Dashboard** - Ringkasan statistik dan grafik keuangan
+- **Manajemen Penghuni** - CRUD data penghuni (tetap & kontrak)
+- **Manajemen Rumah** - CRUD data rumah dengan histori penghuni
+- **Pembayaran** - Pencatatan pembayaran iuran bulanan
+- **Tagihan** - Generate dan kelola tagihan bulanan
+- **Pengeluaran** - Pencatatan pengeluaran RT
+- **Laporan** - Laporan keuangan dengan chart
+- **Log Aktivitas** - Tracking semua aktivitas pengguna
+
+## 🛠️ Tech Stack
 
 ### Backend
-
-- **Laravel 12** - PHP Framework
-- **PHP 8.3+** - Programming Language
-- **MySQL/SQLite** - Database
-- **Laravel Sanctum** - Authentication
-- **Repository Pattern** - Data Access Layer
-- **Service Layer** - Business Logic
-- **Form Request Validation** - Input Validation
-- **API Resources** - Response Formatting
+- **Framework**: Laravel 12.x
+- **Database**: SQLite
+- **Authentication**: Laravel Sanctum
+- **Architecture**: Repository Pattern + Service Layer
 
 ### Frontend
+- **Framework**: React 18
+- **Build Tool**: Vite
+- **UI Library**: Tailwind CSS v4
+- **Icons**: Lucide React
+- **Routing**: React Router v6
 
-- **React 19** - UI Library
-- **React Router 7** - Routing
-- **Axios** - HTTP Client
-- **TanStack Query** - Data Fetching
-- **React Hook Form** - Form Management
-- **TailwindCSS** - Styling
-- **Recharts** - Charts & Graphs
-- **Lucide React** - Icons
+## 📊 Entity Relationship Diagram (ERD)
 
-## 📋 Fitur
+```
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│     users       │       │   residents     │       │     houses      │
+├─────────────────┤       ├─────────────────┤       ├─────────────────┤
+│ id (PK)         │       │ id (PK)         │       │ id (PK)         │
+│ name            │       │ nik (unique)    │       │ nomor_rumah     │
+│ email           │       │ nama_lengkap    │       │ blok            │
+│ password        │       │ status          │       │ status          │
+│ role            │       │ is_active       │       │ current_resident│
+│ phone           │       │ tanggal_masuk   │       │ catatan         │
+│ created_at      │       │ created_at      │       │ created_at      │
+│ updated_at      │       │ updated_at      │       │ updated_at      │
+└─────────────────┘       └─────────────────┘       └─────────────────┘
+         │                         │                         │
+         │                         │                         │
+         │              ┌─────────────────┐                │
+         │              │ house_resident  │                │
+         │              │    (history)    │                │
+         │              ├─────────────────┤                │
+         │              │ id (PK)         │                │
+         │              │ house_id (FK)   │────────────────┘
+         │              │ resident_id (FK)│
+         │              │ tanggal_masuk   │
+         │              │ tanggal_keluar  │
+         │              │ status          │
+         │              │ catatan         │
+         │              └─────────────────┘
+         │
+         │              ┌─────────────────┐       ┌─────────────────┐
+         │              │  payments       │       │ payment_types   │
+         │              ├─────────────────┤       ├─────────────────┤
+         └─────────────│ id (PK)         │       │ id (PK)         │
+                        │ kode_pembayaran │       │ nama            │
+                        │ house_id (FK)   │───────│ nominal         │
+                        │ resident_id (FK)│       │ slug            │
+                        │ payment_type_id │       │ deskripsi       │
+                        │ nominal         │       │ is_active       │
+                        │ tanggal_bayar   │       │ created_at      │
+                        │ metode_bayar    │       │ updated_at      │
+                        │ status          │       └─────────────────┘
+                        │ created_at      │
+                        │ updated_at      │
+                        └─────────────────┘
+                                │
+                                │              ┌─────────────────┐
+                                │              │  monthly_bills  │
+                                │              ├─────────────────┤
+                                └─────────────│ id (PK)         │
+                                               │ house_id (FK)   │
+                                               │ payment_type_id │
+                                               │ bulan           │
+                                               │ tahun           │
+                                               │ nominal         │
+                                               │ status          │
+                                               │ jatuh_tempo     │
+                                               │ tanggal_lunas   │
+                                               │ created_at      │
+                                               │ updated_at      │
+                                               └─────────────────┘
 
-### Dashboard
-
-- Total Rumah, Rumah Dihuni, Rumah Kosong
-- Total Penghuni, Penghuni Tetap, Penghuni Kontrak
-- Total Pemasukan & Pengeluaran Bulan Ini
-- Saldo Keuangan
-- Grafik Pemasukan vs Pengeluaran (12 bulan)
-- Grafik Pembayaran Iuran
-
-### Penghuni (Residents)
-
-- CRUD lengkap dengan validasi
-- Upload Foto KTP
-- Status Tetap/Kontrak
-- Riwayat Penghuni per Rumah
-- Pencarian & Filter
-
-### Rumah (Houses)
-
-- CRUD lengkap
-- Status Dihuni/Tidak Dihuni
-- Riwayat Penghuni
-- Relasi dengan Penghuni Aktif
-
-### Pembayaran (Payments)
-
-- Pencatatan Pembayaran
-- Bayar Bulanan/Multiple Bulan/Tahun Penuh
-- Generate Kode Pembayaran Otomatis
-- Upload Bukti Bayar
-
-### Tagihan (Bills)
-
-- Generate Tagihan Otomatis
-- Filter by Bulan/Tahun/Status
-- Summary Tagihan
-
-### Pengeluaran (Expenses)
-
-- CRUD Pengeluaran
-- Kategori Pengeluaran
-- Upload Bukti Nota
-
-### Laporan (Reports)
-
-- Ringkasan Bulanan
-- Grafik 12 Bulan
-- Detail Pemasukan & Pengeluaran
-- Export PDF & Excel (Coming Soon)
-
-### Activity Logs
-
-- Tracking semua aktivitas sistem
-- User, Action, Module, Description
-- IP Address & User Agent
-
-## 🗄️ Database Schema
-
-### Tables
-
-- `users` - User management
-- `residents` - Data penghuni
-- `houses` - Data rumah
-- `resident_house_histories` - Riwayat penghuni per rumah
-- `payment_types` - Jenis iuran (Satpam, Kebersihan)
-- `monthly_bills` - Tagihan bulanan
-- `payments` - Pembayaran
-- `expense_categories` - Kategori pengeluaran
-- `expenses` - Data pengeluaran
-- `activity_logs` - Log aktivitas
-
-## 🔧 Instalasi
-
-### Prerequisites
-
-- PHP 8.3+
-- Composer
-- Node.js 18+
-- MySQL/SQLite
-
-### Backend Setup
-
-1. **Clone repository**
-
-```bash
-cd backend
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│  expenses       │       │ expense_categories│     │ activity_logs   │
+├─────────────────┤       ├─────────────────┤       ├─────────────────┤
+│ id (PK)         │       │ id (PK)         │       │ id (PK)         │
+│ category_id (FK)│───────│ nama            │       │ user_id (FK)    │
+│ nama_pengeluaran│       │ slug            │       │ action          │
+│ nominal         │       │ is_active       │       │ module          │
+│ tanggal         │       │ created_at      │       │ description     │
+│ keterangan      │       │ updated_at      │       │ subject_type    │
+│ created_by      │       └─────────────────┘       │ subject_id      │
+│ created_at      │                                 │ old_data        │
+│ updated_at      │                                 │ new_data        │
+└─────────────────┘                                 │ ip_address      │
+                                                    │ user_agent      │
+                                                    │ created_at      │
+                                                    │ updated_at      │
+                                                    └─────────────────┘
 ```
 
-2. **Install dependencies**
+### Relasi Database
 
-```bash
-composer install
-```
-
-3. **Environment configuration**
-
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-Edit `.env`:
-
-```env
-DB_CONNECTION=sqlite
-# atau untuk MySQL:
-# DB_CONNECTION=mysql
-# DB_HOST=127.0.0.1
-# DB_PORT=3306
-# DB_DATABASE=administrasi_rt
-# DB_USERNAME=root
-# DB_PASSWORD=
-```
-
-4. **Create database (untuk MySQL)**
-
-```bash
-mysql -u root -p
-CREATE DATABASE administrasi_rt CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-5. **Run migrations & seeders**
-
-```bash
-php artisan migrate:fresh --seed
-```
-
-6. **Start server**
-
-```bash
-php artisan serve --port=8000
-```
-
-Backend akan berjalan di `http://localhost:8000`
-
-### Frontend Setup
-
-1. **Install dependencies**
-
-```bash
-cd frontend
-npm install
-```
-
-2. **Start development server**
-
-```bash
-npm run dev
-```
-
-Frontend akan berjalan di `http://localhost:5173`
-
-## 🔐 Akun Default
-
-Setelah menjalankan seeder, Anda bisa login dengan:
-
-| Role      | Email                   | Password |
-| --------- | ----------------------- | -------- |
-| Admin     | admin@rtjagoan.test     | password |
-| Ketua RT  | ketua@rtjagoan.test     | password |
-| Bendahara | bendahara@rtjagoan.test | password |
+1. **users** ↔ **residents** - Tidak langsung, user adalah admin
+2. **houses** ↔ **residents** - Many-to-Many melalui `house_resident` (histori)
+3. **houses** → **residents** - One-to-One (current_resident_id)
+4. **payments** → **houses** - Many-to-One
+5. **payments** → **residents** - Many-to-One
+6. **payments** → **payment_types** - Many-to-One
+7. **monthly_bills** → **houses** - Many-to-One
+8. **monthly_bills** → **payment_types** - Many-to-One
+9. **expenses** → **expense_categories** - Many-to-One
+10. **activity_logs** → **users** - Many-to-One
 
 ## 📁 Struktur Project
 
 ```
-backend/
-├── app/
-│   ├── Enums/
-│   │   └── ResidentStatus.php
-│   ├── Exceptions/
-│   ├── Http/
-│   │   ├── Controllers/Api/
-│   │   │   ├── AuthController.php
-│   │   │   ├── DashboardController.php
-│   │   │   ├── ResidentController.php
-│   │   │   ├── HouseController.php
-│   │   │   ├── PaymentController.php
-│   │   │   ├── ExpenseController.php
-│   │   │   ├── BillController.php
-│   │   │   └── ReportController.php
-│   │   ├── Requests/
-│   │   │   ├── StoreResidentRequest.php
-│   │   │   ├── StoreHouseRequest.php
-│   │   │   ├── StorePaymentRequest.php
-│   │   │   └── StoreExpenseRequest.php
-│   │   └── Resources/
-│   │       ├── ResidentResource.php
-│   │       ├── HouseResource.php
-│   │       ├── PaymentResource.php
-│   │       └── ExpenseResource.php
-│   ├── Models/
-│   │   ├── User.php
-│   │   ├── Resident.php
-│   │   ├── House.php
-│   │   ├── ResidentHouseHistory.php
-│   │   ├── PaymentType.php
-│   │   ├── MonthlyBill.php
-│   │   ├── Payment.php
-│   │   ├── ExpenseCategory.php
-│   │   ├── Expense.php
-│   │   └── ActivityLog.php
-│   ├── Providers/
-│   │   └── RepositoryServiceProvider.php
-│   ├── Repositories/
-│   │   ├── Contracts/
-│   │   │   ├── BaseRepositoryInterface.php
-│   │   │   ├── ResidentRepositoryInterface.php
-│   │   │   ├── HouseRepositoryInterface.php
-│   │   │   ├── PaymentRepositoryInterface.php
-│   │   │   └── ExpenseRepositoryInterface.php
-│   │   ├── BaseRepository.php
-│   │   ├── ResidentRepository.php
-│   │   ├── HouseRepository.php
-│   │   ├── PaymentRepository.php
-│   │   └── ExpenseRepository.php
-│   └── Services/
-│       ├── DashboardService.php
-│       ├── ResidentService.php
-│       ├── HouseService.php
-│       ├── PaymentService.php
-│       ├── ExpenseService.php
-│       ├── BillService.php
-│       └── ReportService.php
-├── database/
-│   ├── migrations/
-│   │   ├── 0001_01_01_000000_create_users_table.php
-│   │   ├── 2024_01_01_000001_create_residents_table.php
-│   │   ├── 2024_01_01_000002_create_houses_table.php
-│   │   ├── 2024_01_01_000003_create_payment_types_table.php
-│   │   └── 2024_01_01_000004_create_expenses_table.php
-│   └── seeders/
-│       └── DatabaseSeeder.php
-└── routes/
-    └── api.php
-
-frontend/
-├── src/
-│   ├── components/
-│   │   └── AppLayout.jsx
-│   ├── pages/
-│   │   ├── LoginPage.jsx
-│   │   ├── DashboardPage.jsx
-│   │   ├── ResidentsPage.jsx
-│   │   ├── HousesPage.jsx
-│   │   ├── PaymentsPage.jsx
-│   │   ├── BillsPage.jsx
-│   │   ├── ExpensesPage.jsx
-│   │   ├── ReportsPage.jsx
-│   │   └── ActivityLogsPage.jsx
-│   ├── lib/
-│   │   └── api.js
-│   ├── App.jsx
-│   └── main.jsx
-├── package.json
-├── vite.config.js
-├── tailwind.config.js
-└── postcss.config.js
+Jagoan-Hosting/
+├── backend/                 # Laravel Backend
+│   ├── app/
+│   │   ├── Http/
+│   │   │   └── Controllers/
+│   │   │       └── Api/     # API Controllers
+│   │   ├── Models/          # Eloquent Models
+│   │   ├── Repositories/    # Repository Pattern
+│   │   │   ├── Contracts/   # Interfaces
+│   │   │   └── *.php        # Implementations
+│   │   ├── Services/        # Business Logic
+│   │   └── Providers/       # Service Providers
+│   ├── database/
+│   │   ├── migrations/      # Database Migrations
+│   │   └── seeders/         # Database Seeders
+│   ├── routes/
+│   │   └── api.php          # API Routes
+│   └── storage/             # File Storage
+│
+├── frontend/                # React Frontend
+│   ├── src/
+│   │   ├── components/      # Reusable Components
+│   │   │   └── AppLayout.jsx
+│   │   ├── pages/           # Page Components
+│   │   │   ├── DashboardPage.jsx
+│   │   │   ├── ResidentsPage.jsx
+│   │   │   ├── HousesPage.jsx
+│   │   │   ├── PaymentsPage.jsx
+│   │   │   ├── BillsPage.jsx
+│   │   │   ├── ExpensesPage.jsx
+│   │   │   ├── ReportsPage.jsx
+│   │   │   └── ActivityLogsPage.jsx
+│   │   ├── App.jsx          # Main App Component
+│   │   └── main.jsx         # Entry Point
+│   └── public/              # Static Assets
+│
+└── image/                   # Screenshots
+    ├── dashboard.png
+    ├── login.png
+    ├── penghuni.png
+    ├── rumah.png
+    ├── pembayaran.png
+    ├── tagihan.png
+    ├── pengeluaran.png
+    ├── laporan.png
+    └── aktifitas.png
 ```
 
-## 🔌 API Endpoints
+## 🚀 Panduan Instalasi
 
-### Authentication
+### Prerequisites
 
-- `POST /api/login` - Login
-- `POST /api/logout` - Logout
-- `GET /api/me` - Get current user
+Pastikan sistem Anda memiliki:
+- **PHP** >= 8.2
+- **Composer** >= 2.0
+- **Node.js** >= 16.x
+- **NPM** >= 8.x
+- **SQLite** (sudah terinstall di macOS)
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/nandasafiqalfiansyah/Administrasi-RT-Full-Stack-Application.git
+cd Administrasi-RT-Full-Stack-Application
+```
+
+### 2. Setup Backend (Laravel)
+
+```bash
+# Masuk ke direktori backend
+cd backend
+
+# Install dependencies
+composer install
+
+# Copy file environment
+cp .env.example .env
+
+# Generate application key
+php artisan key:generate
+
+# Buat database SQLite
+touch database/database.sqlite
+
+# Jalankan migrasi dan seeder
+php artisan migrate --seed
+
+# Install Laravel Sanctum (jika belum)
+composer require laravel/sanctum
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+php artisan migrate
+```
+
+### 3. Setup Frontend (React)
+
+```bash
+# Dari root project, masuk ke direktori frontend
+cd ../frontend
+
+# Install dependencies
+npm install
+```
+
+### 4. Konfigurasi Environment
+
+#### Backend (.env)
+```env
+APP_NAME="Administrasi RT"
+APP_ENV=local
+APP_KEY=base64:GENERATED_KEY
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+LOG_CHANNEL=stack
+LOG_LEVEL=debug
+
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+
+SANCTUM_STATEFUL_DOMAINS=localhost:5173
+```
+
+#### Frontend (.env)
+```env
+VITE_API_URL=http://localhost:8000/api
+```
+
+### 5. Menjalankan Aplikasi
+
+#### Terminal 1 - Backend Server
+```bash
+cd backend
+php artisan serve --host=0.0.0.0 --port=8000
+```
+
+#### Terminal 2 - Frontend Server
+```bash
+cd frontend
+npm run dev
+```
+
+### 6. Akses Aplikasi
+
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000/api
+- **Default Credentials**:
+  - Email: `admin@rt.com`
+  - Password: `password`
+
+## 📸 Screenshots
 
 ### Dashboard
+![Dashboard](image/dashboard.png)
+*Halaman dashboard menampilkan ringkasan statistik, grafik pemasukan/pengeluaran, dan status keuangan RT*
 
-- `GET /api/dashboard` - Get dashboard data
+### Login
+![Login](image/login.png)
+*Halaman login untuk autentikasi pengguna*
 
-### Residents
+### Manajemen Penghuni
+![Penghuni](image/penghuni.png)
+*Halaman kelola data penghuni RT dengan status tetap dan kontrak*
 
-- `GET /api/residents` - List residents
-- `GET /api/residents/{id}` - Get resident detail
-- `POST /api/residents` - Create resident
-- `PUT /api/residents/{id}` - Update resident
-- `DELETE /api/residents/{id}` - Delete resident
+### Manajemen Rumah
+![Rumah](image/rumah.png)
+*Halaman kelola data rumah dengan informasi penghuni saat ini*
 
-### Houses
+### Pembayaran
+![Pembayaran](image/pembayaran.png)
+*Halaman pencatatan dan riwayat pembayaran iuran*
 
-- `GET /api/houses` - List houses
-- `GET /api/houses/{id}` - Get house detail
-- `POST /api/houses` - Create house
-- `PUT /api/houses/{id}` - Update house
-- `DELETE /api/houses/{id}` - Delete house
-- `GET /api/houses/{id}/history` - Get house history
+### Tagihan
+![Tagihan](image/tagihan.png)
+*Halaman generate dan kelola tagihan bulanan*
 
-### Payments
+### Pengeluaran
+![Pengeluaran](image/pengeluaran.png)
+*Halaman pencatatan pengeluaran RT*
 
-- `GET /api/payments` - List payments
-- `POST /api/payments` - Create payment
-- `DELETE /api/payments/{id}` - Delete payment
+### Laporan
+![Laporan](image/laporan.png)
+*Halaman laporan keuangan dengan visualisasi chart*
 
-### Bills
+### Log Aktivitas
+![Aktivitas](image/aktifitas.png)
+*Halaman tracking log aktivitas semua pengguna*
 
-- `GET /api/bills` - List bills
-- `POST /api/bills/generate` - Generate monthly bills
-- `GET /api/bills/summary` - Get bills summary
+## 🔧 Troubleshooting
 
-### Expenses
-
-- `GET /api/expenses` - List expenses
-- `GET /api/expenses/{id}` - Get expense detail
-- `POST /api/expenses` - Create expense
-- `PUT /api/expenses/{id}` - Update expense
-- `DELETE /api/expenses/{id}` - Delete expense
-
-### Reports
-
-- `GET /api/reports/summary` - Get monthly summary
-- `GET /api/reports/chart` - Get yearly chart data
-- `GET /api/reports/detail` - Get detailed report
-
-### Reference Data
-
-- `GET /api/payment-types` - Get payment types
-- `GET /api/expense-categories` - Get expense categories
-
-## 🎨 UI/UX Features
-
-- **Modern Dashboard** - Clean, intuitive interface
-- **Dark Mode** - Full dark mode support
-- **Responsive Design** - Mobile & Desktop friendly
-- **Sidebar Navigation** - Easy navigation
-- **Charts & Graphs** - Visual data representation
-- **Loading States** - Better UX
-- **Error Handling** - User-friendly error messages
-- **Search & Filter** - Quick data access
-
-## 🧪 Testing
-
-### Backend Testing
-
+### Error: "Class 'ActivityLog' not found"
 ```bash
+# Jalankan ulang migrasi
 cd backend
-php artisan test
+php artisan migrate:fresh --seed
 ```
 
-### Frontend Testing
+### Error: "No such function: MONTH" (SQLite)
+Sudah diperbaui dengan menggunakan `strftime()` untuk kompatibilitas SQLite.
 
+### Port sudah digunakan
 ```bash
-cd frontend
-npm test
+# Ganti port backend
+php artisan serve --port=8001
+
+# Ganti port frontend
+npm run dev -- --port 5174
 ```
 
-## 📝 Development Notes
-
-### Architecture Pattern
-
-- **Repository Pattern** untuk abstraksi data access
-- **Service Layer** untuk business logic
-- **Form Request** untuk validasi
-- **API Resources** untuk response formatting
-- **Dependency Injection** untuk testability
-
-### Key Features Implemented
-
-✅ Clean Architecture
-✅ Repository Pattern
-✅ Service Layer
-✅ Form Request Validation
-✅ API Resources
-✅ Sanctum Authentication
-✅ Activity Logging
-✅ Soft Deletes
-✅ Pagination, Search, Filter, Sort
-✅ File Upload (KTP, Bukti Bayar, Nota)
-✅ Automatic Bill Generation
-✅ Comprehensive Seeder
-✅ Dark Mode
-✅ Responsive UI
-✅ Charts & Analytics
-
-## 🚀 Deployment
-
-### Backend
-
+### Permission denied pada storage
 ```bash
-cd backend
-composer install --optimize-autoloader --no-dev
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
-php artisan migrate --force
-php artisan db:seed --force
+chmod -R 775 backend/storage
+chmod -R 775 backend/bootstrap/cache
 ```
 
-### Frontend
+## 📝 Catatan Penting
 
-```bash
-cd frontend
-npm run build
-```
+1. **Database**: Menggunakan SQLite untuk kemudahan development. Untuk production, disarankan menggunakan MySQL/PostgreSQL.
+2. **Authentication**: Menggunakan Laravel Sanctum dengan token-based authentication.
+3. **File Upload**: Fitur upload bukti bayar dan nota tersedia namun belum diimplementasi di frontend.
+4. **Pagination**: Semua data menggunakan pagination dengan 10 item per halaman.
+5. **Dark Mode**: Frontend sudah mendukung dark mode.
 
-## 📊 Database Seeder
+## 🤝 Kontribusi
 
-Seeder akan membuat:
-
-- 3 Users (Admin, Ketua RT, Bendahara)
-- 2 Payment Types (Satpam: 100rb, Kebersihan: 15rb)
-- 6 Expense Categories
-- 20 Residents (15 Tetap + 5 Kontrak)
-- 20 Houses (15 Dihuni + 5 Kosong)
-- 12 Bulan Tagihan & Pembayaran
-- Pengeluaran 12 Bulan
-- Activity Logs
-
-## 🤝 Contributing
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+1. Fork repository
+2. Buat branch baru (`git checkout -b feature/AmazingFeature`)
+3. Commit perubahan (`git commit -m 'Add some AmazingFeature'`)
+4. Push ke branch (`git push origin feature/AmazingFeature`)
+5. Buka Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+Distributed under the MIT License. See `LICENSE` for more information.
 
-## 👨‍💻 Author
+## 👨‍💻 Developer
 
-Built with ❤️ for Administrasi RT
+**Nanda Safiq Alfiansyah**
+- GitHub: [@nandasafiqalfiansyah](https://github.com/nandasafiqalfiansyah)
+- Repository: [Administrasi-RT-Full-Stack-Application](https://github.com/nandasafiqalfiansyah/Administrasi-RT-Full-Stack-Application)
+
+## 📞 Support
+
+Untuk pertanyaan atau masalah, silakan buat issue di repository GitHub.
+
+---
+
+**© 2026 Administrasi RT. All rights reserved.**
