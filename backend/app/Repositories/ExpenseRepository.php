@@ -30,7 +30,7 @@ class ExpenseRepository extends BaseRepository implements ExpenseRepositoryInter
     public function getPengeluaranPerBulan(int $tahun): array
     {
         $data = $this->model->select(
-            DB::raw('MONTH(tanggal) as bulan'),
+            DB::raw('CAST(strftime("%m", tanggal) as INTEGER) as bulan'),
             DB::raw('SUM(nominal) as total')
         )
         ->whereYear('tanggal', $tahun)

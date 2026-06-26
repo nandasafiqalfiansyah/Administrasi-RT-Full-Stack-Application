@@ -31,7 +31,7 @@ class PaymentRepository extends BaseRepository implements PaymentRepositoryInter
     public function getPemasukanPerBulan(int $tahun): array
     {
         $data = $this->model->select(
-            DB::raw('MONTH(tanggal_bayar) as bulan'),
+            DB::raw('CAST(strftime("%m", tanggal_bayar) as INTEGER) as bulan'),
             DB::raw('SUM(nominal) as total')
         )
         ->whereYear('tanggal_bayar', $tahun)
@@ -50,7 +50,7 @@ class PaymentRepository extends BaseRepository implements PaymentRepositoryInter
     public function getPembayaranIuranPerBulan(int $tahun): array
     {
         $data = MonthlyBill::select(
-            DB::raw('MONTH(jatuh_tempo) as bulan'),
+            DB::raw('CAST(strftime("%m", jatuh_tempo) as INTEGER) as bulan'),
             DB::raw('SUM(CASE WHEN status = "lunas" THEN nominal ELSE 0 END) as total_lunas'),
             DB::raw('SUM(nominal) as total_tagihan')
         )

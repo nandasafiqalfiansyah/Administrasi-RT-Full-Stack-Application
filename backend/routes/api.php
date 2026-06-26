@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\BillController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\ActivityLogController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -55,6 +56,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/summary', [ReportController::class, 'summary']);
     Route::get('/reports/chart', [ReportController::class, 'chart']);
     Route::get('/reports/detail', [ReportController::class, 'detail']);
+
+    // Activity Logs
+    Route::get('/activity-logs', [ActivityLogController::class, 'index']);
+    Route::get('/activity-logs/recent', [ActivityLogController::class, 'recent']);
+    Route::get('/activity-logs/stats', [ActivityLogController::class, 'stats']);
+    Route::get('/activity-logs/user/{userId}', [ActivityLogController::class, 'byUser']);
+    Route::get('/activity-logs/model', [ActivityLogController::class, 'byModel']);
+    Route::get('/activity-logs/action/{action}', [ActivityLogController::class, 'byAction']);
+    Route::get('/activity-logs/date-range', [ActivityLogController::class, 'byDateRange']);
 
     // Payment Types
     Route::get('/payment-types', function () {

@@ -69,7 +69,7 @@ class Payment extends Model
     {
         $prefix = 'PMT';
         $date = now()->format('Ymd');
-        $random = strtoupper(substr(uniqid(), -4));
+        $random = strtoupper(substr(uniqid('', true), -6));
         return "{$prefix}-{$date}-{$random}";
     }
 }
